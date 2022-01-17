@@ -63,7 +63,7 @@ uint8_t testReg(LSM6_t *LSM6, uint8_t address, uint8_t reg)
 {
 	uint8_t Value;
 
-	if (HAL_OK == HAL_I2C_Mem_Read(LSM6->i2c, address, reg, I2C_MEMADD_SIZE_8BIT, &Value, I2C_MEMADD_SIZE_8BIT, LSM6->io_timeout))
+	if (HAL_OK == HAL_I2C_Mem_Read(LSM6->i2c, (address)<<1, reg, 1, &Value, 1, LSM6->io_timeout))
 	{
 		return Value;
 	}
@@ -105,13 +105,13 @@ void enableDefault(LSM6_t *LSM6)
 	// Accelerometer
 	// ODR = 0110 (416 Hz (high performance)); FS_XL = 00 (+/-2 g full scale)
 	  writeReg(LSM6, CTRL9_XL, 0x38);	// Accelerometer X, Y, Z axes enabled
-	  writeReg(LSM6, CTRL1_XL, 0x60);	// Accelerometer = 416Hz
+	  writeReg(LSM6, CTRL1_XL, 0x10);	// Accelerometer = 416Hz
 	  writeReg(LSM6, INT1_CTRL, 0x01);	// Accelerometer data ready interrupt on INT1
 
 	// Gyroscope
 	// ODR = 0110 (416 Hz (high performance)); FS_XL = 00 (245 dps)
 	  writeReg(LSM6, CTRL10_C, 0x38);	// Gyroscope X, Y, Z axes enabled
-	  writeReg(LSM6, CTRL2_G, 0x60);	// Gyroscope = 416Hz
+	  writeReg(LSM6, CTRL2_G, 0x10);	// Gyroscope = 416Hz
 	  writeReg(LSM6, INT2_CTRL, 0x02);	// Gyroscope data ready interrupt on INT2
 
 	// Common
@@ -127,7 +127,7 @@ void writeReg(LSM6_t *LSM6, uint8_t reg, uint8_t value)
 	uint8_t status;
 
 	// Write 8-bits
-	status = HAL_I2C_Mem_Write(LSM6->i2c, LSM6->address, reg, I2C_MEMADD_SIZE_8BIT, &value, I2C_MEMADD_SIZE_8BIT, LSM6->io_timeout);
+	status = HAL_I2C_Mem_Write(LSM6->i2c, (LSM6->address<<1), reg, I2C_MEMADD_SIZE_8BIT, &value, I2C_MEMADD_SIZE_8BIT, LSM6->io_timeout);
 
 	// check for errors
 	if(status == HAL_BUSY)
@@ -146,7 +146,7 @@ uint8_t readReg(LSM6_t *LSM6, uint8_t reg)
 	uint8_t value, status;
 
 	// Read 8 bits
-	status = HAL_I2C_Mem_Read(LSM6->i2c, LSM6->address, reg, I2C_MEMADD_SIZE_8BIT, &value, I2C_MEMADD_SIZE_8BIT, LSM6->io_timeout);
+	status = HAL_I2C_Mem_Read(LSM6->i2c, (LSM6->address<<1), reg, I2C_MEMADD_SIZE_8BIT, &value, I2C_MEMADD_SIZE_8BIT, LSM6->io_timeout);
 
 	// check for errors
 	if(status == HAL_BUSY)
@@ -231,7 +231,7 @@ uint8_t LSM6_Read(LSM6_t *LSM6)
 	}
 
 	// Read gyroscope data
-	if ((status = readAcc(LSM6)) != HAL_OK)
+	if ((status = readGyro(LSM6)) != HAL_OK)
 	{
 		return status;
 	}

@@ -1,2 +1,5 @@
-freertos.c:73:6:MX_FREERTOS_Init	8	static
-freertos.c:115:6:HeartbeatTask	16	static
+freertos.c:99:6:MX_FREERTOS_Init	8	static
+freertos.c:154:6:StartHeartbeatTask	16	static
+freertos.c:173:6:StartIMU_Task	40	static
+freertos.c:207:6:_putchar	16	static
+freertos.c:216:6:HAL_GPIO_EXTI_Callback	16	static

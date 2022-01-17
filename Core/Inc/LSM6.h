@@ -122,7 +122,7 @@ typedef struct lsm6
 // Initialize extended function - detecting device using deviceType and sa0State (definition above)
 bool LSM6_InitEx(I2C_HandleTypeDef *i2c, LSM6_t *LSM6, deviceType device, sa0State sa0);
 // Initialize function - default DS33 device and SA0 pin connected to GND
-inline bool LSM6_Init(I2C_HandleTypeDef *i2c, LSM6_t *LSM6) { return LSM6_InitEx(i2c, LSM6, device_DS33, sa0_low); }
+//bool LSM6_Init(I2C_HandleTypeDef *i2c, LSM6_t *LSM6) { return LSM6_InitEx(i2c, LSM6, device_DS33, sa0_low);}
 // Returns chip id if communication is established, return 0 if not
 uint8_t testReg(LSM6_t *LSM6, uint8_t address, uint8_t reg);
 // Writes 8-bits

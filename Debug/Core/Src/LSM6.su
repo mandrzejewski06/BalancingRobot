@@ -1,0 +1,15 @@
+LSM6.c:12:6:LSM6_InitEx	24	static
+LSM6.c:62:9:testReg	40	static
+LSM6.c:77:6:timeoutOccurred	24	static
+LSM6.c:84:6:errorOccured	24	static
+LSM6.c:91:6:setTimeout	16	static
+LSM6.c:96:10:getTimeout	16	static
+LSM6.c:101:6:enableDefault	16	static
+LSM6.c:125:6:writeReg	40	static
+LSM6.c:144:9:readReg	40	static
+LSM6.c:166:9:readAcc	24	static
+LSM6.c:194:9:readGyro	24	static
+LSM6.c:223:9:LSM6_Read	24	static
+LSM6.c:243:9:vector_dot	16	static
+LSM6.c:248:6:vector_cross	24	static
+LSM6.c:255:6:vector_normalize	32	static
