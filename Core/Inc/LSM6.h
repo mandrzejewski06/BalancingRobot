@@ -91,13 +91,10 @@
 // Structure to memorize coordinates of a vector
 typedef struct vector
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	double x;
+	double y;
+	double z;
 } Vector_t;
-
-// Boolean type definition
-typedef enum bool {false = ERROR, true = 1} bool;
 
 // Used to manually choose device type or detect device automatically
 typedef enum deviceType {device_DS33, device_autoDetect} deviceType;

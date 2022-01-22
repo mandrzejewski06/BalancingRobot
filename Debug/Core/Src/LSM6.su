@@ -7,9 +7,9 @@ LSM6.c:96:10:getTimeout	16	static
 LSM6.c:101:6:enableDefault	16	static
 LSM6.c:125:6:writeReg	40	static
 LSM6.c:144:9:readReg	40	static
-LSM6.c:166:9:readAcc	24	static
-LSM6.c:194:9:readGyro	24	static
+LSM6.c:166:9:readAcc	32	static
+LSM6.c:194:9:readGyro	32	static
 LSM6.c:223:9:LSM6_Read	24	static
-LSM6.c:243:9:vector_dot	16	static
-LSM6.c:248:6:vector_cross	24	static
+LSM6.c:243:9:vector_dot	32	static
+LSM6.c:248:6:vector_cross	40	static
 LSM6.c:255:6:vector_normalize	32	static

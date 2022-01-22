@@ -59,7 +59,7 @@ main-build: BalancingRobot.elf secondary-outputs
 
 # Tool invocations
 BalancingRobot.elf: $(OBJS) $(USER_OBJS) C:\Users\mand2\STM32CubeIDE\workspace_1.4.0\BalancingRobot\STM32F411RETX_FLASH.ld
-	arm-none-eabi-gcc -o "BalancingRobot.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mand2\STM32CubeIDE\workspace_1.4.0\BalancingRobot\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BalancingRobot.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "BalancingRobot.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mand2\STM32CubeIDE\workspace_1.4.0\BalancingRobot\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BalancingRobot.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

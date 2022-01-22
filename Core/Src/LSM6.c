@@ -105,13 +105,13 @@ void enableDefault(LSM6_t *LSM6)
 	// Accelerometer
 	// ODR = 0110 (416 Hz (high performance)); FS_XL = 00 (+/-2 g full scale)
 	  writeReg(LSM6, CTRL9_XL, 0x38);	// Accelerometer X, Y, Z axes enabled
-	  writeReg(LSM6, CTRL1_XL, 0x10);	// Accelerometer = 416Hz
+	  writeReg(LSM6, CTRL1_XL, 0x30);	// Accelerometer = 52hz
 	  writeReg(LSM6, INT1_CTRL, 0x01);	// Accelerometer data ready interrupt on INT1
 
 	// Gyroscope
 	// ODR = 0110 (416 Hz (high performance)); FS_XL = 00 (245 dps)
 	  writeReg(LSM6, CTRL10_C, 0x38);	// Gyroscope X, Y, Z axes enabled
-	  writeReg(LSM6, CTRL2_G, 0x10);	// Gyroscope = 416Hz
+	  writeReg(LSM6, CTRL2_G, 0x30);	// Gyroscope = 52hz
 	  writeReg(LSM6, INT2_CTRL, 0x02);	// Gyroscope data ready interrupt on INT2
 
 	// Common
@@ -256,7 +256,7 @@ void vector_normalize(Vector_t *vector)
 {
 	float mag = sqrt(vector_dot(vector, vector));
 
-	vector->x = (int16_t) (vector->x / mag);
-	vector->y = (int16_t) (vector->y / mag);
-	vector->z = (int16_t) (vector->z / mag);
+	vector->x = (vector->x / mag);
+	vector->y = (vector->y / mag);
+	vector->z = (vector->z / mag);
 }

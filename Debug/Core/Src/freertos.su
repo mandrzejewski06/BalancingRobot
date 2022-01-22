@@ -1,5 +1,10 @@
-freertos.c:99:6:MX_FREERTOS_Init	8	static
-freertos.c:154:6:StartHeartbeatTask	16	static
-freertos.c:173:6:StartIMU_Task	40	static
-freertos.c:207:6:_putchar	16	static
-freertos.c:216:6:HAL_GPIO_EXTI_Callback	16	static
+freertos.c:147:6:MX_FREERTOS_Init	8	static
+freertos.c:222:6:StartHeartbeatTask	16	static
+freertos.c:241:6:StartIMU_Task	112	static
+freertos.c:289:6:StartPIDTask	192	static
+freertos.c:323:6:StartStepperMotorsTask	32	static
+freertos.c:340:6:TimerPIDCallback	16	static
+freertos.c:349:6:_putchar	16	static
+freertos.c:358:6:HAL_GPIO_EXTI_Callback	16	static
+freertos.c:366:8:complementaryFilter	48	static
+freertos.c:372:8:calculateAccAngle	40	static
