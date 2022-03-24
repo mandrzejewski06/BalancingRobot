@@ -66,12 +66,16 @@ void Error_Handler(void);
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_5
-#define LD2_GPIO_Port GPIOA
-#define leftMotor_DIR_Pin GPIO_PIN_10
-#define leftMotor_DIR_GPIO_Port GPIOB
-#define leftMotor_STEP_Pin GPIO_PIN_8
-#define leftMotor_STEP_GPIO_Port GPIOA
+#define leftMotor_M1_Pin GPIO_PIN_5
+#define leftMotor_M1_GPIO_Port GPIOA
+#define leftMotor_M0_Pin GPIO_PIN_6
+#define leftMotor_M0_GPIO_Port GPIOA
+#define leftMotor_STEP_Pin GPIO_PIN_10
+#define leftMotor_STEP_GPIO_Port GPIOB
+#define leftMotor_DIR_Pin GPIO_PIN_8
+#define leftMotor_DIR_GPIO_Port GPIOA
+#define rightMotor_DIR_Pin GPIO_PIN_9
+#define rightMotor_DIR_GPIO_Port GPIOA
 #define LSM6_Interrupt_Pin GPIO_PIN_10
 #define LSM6_Interrupt_GPIO_Port GPIOA
 #define LSM6_Interrupt_EXTI_IRQn EXTI15_10_IRQn
@@ -81,9 +85,11 @@ void Error_Handler(void);
 #define TCK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
-#define rightMotor_DIR_Pin GPIO_PIN_4
-#define rightMotor_DIR_GPIO_Port GPIOB
-#define rightMotor_STEP_Pin GPIO_PIN_5
+#define rightMotor_M0_Pin GPIO_PIN_4
+#define rightMotor_M0_GPIO_Port GPIOB
+#define rightMotor_M1_Pin GPIO_PIN_5
+#define rightMotor_M1_GPIO_Port GPIOB
+#define rightMotor_STEP_Pin GPIO_PIN_6
 #define rightMotor_STEP_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 

@@ -1,3 +1,4 @@
+"Core/Src/DRV8834.o"
 "Core/Src/LSM6.o"
 "Core/Src/PID.o"
 "Core/Src/freertos.o"

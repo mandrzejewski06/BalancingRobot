@@ -1,0 +1,8 @@
+DRV8834.c:13:6:DRV8834_Init	24	static
+DRV8834.c:22:6:DRV8834_InitPins	24	static
+DRV8834.c:34:6:DeinitializePin	40	static
+DRV8834.c:56:9:DRV8834_SetMicrostep	16	static
+DRV8834.c:110:6:DRV8834_StopMotor	16	static
+DRV8834.c:118:6:DRV8834_SetDirection	16	static
+DRV8834.c:127:6:DRV8834_SetSpeed	24	static
+DRV8834.c:175:6:DRV8834_StartMotor	16	static

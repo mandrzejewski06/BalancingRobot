@@ -41,7 +41,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/LSM6.h ../Core/Inc/main.h ../Core/Inc/printf.h \
- ../Core/Inc/i2c.h ../Core/Inc/usart.h ../Core/Inc/PID.h
+ ../Core/Inc/i2c.h ../Core/Inc/usart.h ../Core/Inc/PID.h \
+ ../Core/Inc/DRV8834.h ../Core/Inc/tim.h
 
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 
@@ -138,3 +139,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/usart.h:
 
 ../Core/Inc/PID.h:
+
+../Core/Inc/DRV8834.h:
+
+../Core/Inc/tim.h:
