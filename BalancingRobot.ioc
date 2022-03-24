@@ -1,11 +1,10 @@
 #MicroXplorer Configuration settings - do not modify
-FREERTOS.BinarySemaphores01=SemaphoreLSM6_DataReady,Dynamic,NULL;SemaphorePIDCompute,Dynamic,NULL
+FREERTOS.BinarySemaphores01=SemaphoreLSM6_DataReady,Dynamic,NULL
 FREERTOS.FootprintOK=true
-FREERTOS.IPParameters=Tasks01,FootprintOK,BinarySemaphores01,Mutexes01,Timers01,Queues01
+FREERTOS.IPParameters=Tasks01,FootprintOK,BinarySemaphores01,Mutexes01,Queues01
 FREERTOS.Mutexes01=MutexI2C,Dynamic,NULL;MutexUARTputchar,Dynamic,NULL;MutexMotors,Dynamic,NULL
 FREERTOS.Queues01=QueueInputPID,8,double,0,Dynamic,NULL,NULL;QueueOutputPID,16,double,0,Dynamic,NULL,NULL
 FREERTOS.Tasks01=Heartbeat,8,128,StartHeartbeatTask,Default,NULL,Dynamic,NULL,NULL;IMU_Task,40,256,StartIMU_Task,Default,NULL,Dynamic,NULL,NULL;PIDTask,32,256,StartPIDTask,Default,NULL,Dynamic,NULL,NULL;StepperMotorsTa,24,256,StartStepperMotorsTask,Default,NULL,Dynamic,NULL,NULL
-FREERTOS.Timers01=TimerPID,TimerPIDCallback,osTimerPeriodic,Default,NULL,Dynamic,NULL
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
 I2C1.I2C_Mode=I2C_Fast

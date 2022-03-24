@@ -154,7 +154,7 @@ void DRV8834_SetSpeed(StepMotor_t *stepMotor, int32_t speed)
 	}
 
 
-	freq = (speed * (stepMotor->microstep*DRV8834_MOTOR_MAX_FREQ_HZ - DRV8834_MOTOR_MIN_FREQ_HZ)) / DRV8834_MAX_SPEED;
+	freq = (speed * (stepMotor->microstep*(DRV8834_MOTOR_MAX_FREQ_HZ - DRV8834_MOTOR_MIN_FREQ_HZ))) / DRV8834_MAX_SPEED;
 
 #if USING_WHICH_TIMERS == APB1
 	counter = PCLK_PRESCALER*HAL_RCC_GetPCLK1Freq() / (stepMotor->PWM_timer->Init.Prescaler * freq);

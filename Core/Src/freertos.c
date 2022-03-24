@@ -34,6 +34,7 @@
 #include "math.h"
 #include "DRV8834.h"
 #include "tim.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +51,7 @@
 #define ACC_OFFSET_Y	0.05
 #define ACC_OFFSET_Z	-0.02
 
-#define PID_SAMPLE_TIME 100 // Hz
+#define PID_SAMPLE_TIME 52 // Hz
 #define PID_SETPOINT 0.0
 
 #define PID_DATA_READY 0x00000001
@@ -105,11 +106,6 @@ osMessageQueueId_t QueueOutputPIDHandle;
 const osMessageQueueAttr_t QueueOutputPID_attributes = {
   .name = "QueueOutputPID"
 };
-/* Definitions for TimerPID */
-osTimerId_t TimerPIDHandle;
-const osTimerAttr_t TimerPID_attributes = {
-  .name = "TimerPID"
-};
 /* Definitions for MutexI2C */
 osMutexId_t MutexI2CHandle;
 const osMutexAttr_t MutexI2C_attributes = {
@@ -130,11 +126,6 @@ osSemaphoreId_t SemaphoreLSM6_DataReadyHandle;
 const osSemaphoreAttr_t SemaphoreLSM6_DataReady_attributes = {
   .name = "SemaphoreLSM6_DataReady"
 };
-/* Definitions for SemaphorePIDCompute */
-osSemaphoreId_t SemaphorePIDComputeHandle;
-const osSemaphoreAttr_t SemaphorePIDCompute_attributes = {
-  .name = "SemaphorePIDCompute"
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -147,7 +138,6 @@ void StartHeartbeatTask(void *argument);
 void StartIMU_Task(void *argument);
 void StartPIDTask(void *argument);
 void StartStepperMotorsTask(void *argument);
-void TimerPIDCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -178,16 +168,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of SemaphoreLSM6_DataReady */
   SemaphoreLSM6_DataReadyHandle = osSemaphoreNew(1, 1, &SemaphoreLSM6_DataReady_attributes);
 
-  /* creation of SemaphorePIDCompute */
-  SemaphorePIDComputeHandle = osSemaphoreNew(1, 1, &SemaphorePIDCompute_attributes);
-
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
-
-  /* Create the timer(s) */
-  /* creation of TimerPID */
-  TimerPIDHandle = osTimerNew(TimerPIDCallback, osTimerPeriodic, NULL, &TimerPID_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -313,22 +296,28 @@ void StartPIDTask(void *argument)
 	PID_t PID;
 	double input, output;
 	double setpoint = PID_SETPOINT;
-	double Kp = 6.5;
-	double Ki = 0.0;
-	double Kd = 0.0;
+	double Kp = 3.0;
+//	char KpTemp[5];
+	double Ki = 14.0;
+	double Kd = 0.015;
 
 	PID_Init(&PID, &input, &output, &setpoint, Kp, Ki, Kd, P_ON_ERROR, DIRECT);
 	PID_SetMode(&PID, AUTOMATIC);
 	PID_SetSampleTime(&PID, (uint32_t) ((1.0/(float)PID_SAMPLE_TIME) * 1000.0));
-	PID_SetOutputLimits(&PID, -10*DRV8834_MAX_SPEED, 10*DRV8834_MAX_SPEED);
-	osTimerStart(TimerPIDHandle, (PID.SampleTime * osKernelGetTickFreq()) / 1000);
+	PID_SetOutputLimits(&PID, -DRV8834_MAX_SPEED, DRV8834_MAX_SPEED);
+//	osTimerStart(TimerPIDHandle, (PID.SampleTime * osKernelGetTickFreq()) / 1000);
   /* Infinite loop */
   for(;;)
   {
-	  osSemaphoreAcquire(SemaphorePIDComputeHandle, osWaitForever);
-	  osMessageQueueGet(QueueInputPIDHandle, &input, NULL, 0);
+	  //osSemaphoreAcquire(SemaphorePIDComputeHandle, osWaitForever);
+	  osMessageQueueGet(QueueInputPIDHandle, &input, NULL, osWaitForever);
+//	  if(HAL_OK == HAL_UART_Receive(&huart2, (uint8_t*)KpTemp, sizeof(KpTemp), 2))
+//	  {
+//		  Kp = atof(KpTemp);
+//	  }
+//	  printf("Kp: %.2f\n\r", Kp);
 	  pidMonitorInput = input;
-	  if(input < 30 && input >-30)
+	  if(input < 40 && input >-40)
 	  {
 		  PID_Compute(&PID);
 	  }
@@ -344,7 +333,7 @@ void StartPIDTask(void *argument)
 	  osMessageQueuePut(QueueOutputPIDHandle, &output, 0, 0);
 	  pidMonitorOutput = output;
 	  printf("PID input: %.2f, output:%.2f\n\r", input, output);
-	  osThreadFlagsSet(StepperMotorsTaHandle, PID_DATA_READY);
+	  //osThreadFlagsSet(StepperMotorsTaHandle, PID_DATA_READY);
   }
   /* USER CODE END StartPIDTask */
 }
@@ -379,10 +368,10 @@ void StartStepperMotorsTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	osThreadFlagsWait(PID_DATA_READY, osFlagsWaitAll, osWaitForever);
-    if(osOK == osMessageQueueGet(QueueOutputPIDHandle, &pid_output, NULL, 0))
+	//osThreadFlagsWait(PID_DATA_READY, osFlagsWaitAll, osWaitForever);
+    if(osOK == osMessageQueueGet(QueueOutputPIDHandle, &pid_output, NULL, osWaitForever))
     {
-    	speed = map((int32_t) pid_output, -10*DRV8834_MAX_SPEED, 10*DRV8834_MAX_SPEED, -DRV8834_MAX_SPEED, DRV8834_MAX_SPEED);
+    	speed = (int32_t) pid_output;
     	printf("Step motor input speed:%d\n\r", speed);
     	if((leftMotor.state == STOPPED) && (rightMotor.state == STOPPED) && (speed != 0))
     	{
@@ -406,21 +395,13 @@ void StartStepperMotorsTask(void *argument)
   /* USER CODE END StartStepperMotorsTask */
 }
 
-/* TimerPIDCallback function */
-void TimerPIDCallback(void *argument)
-{
-  /* USER CODE BEGIN TimerPIDCallback */
-	osSemaphoreRelease(SemaphorePIDComputeHandle);
-  /* USER CODE END TimerPIDCallback */
-}
-
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void _putchar(char character)
 {
   // send char to console etc.
 	osMutexAcquire(MutexUARTputcharHandle, osWaitForever);
-	HAL_UART_Transmit(&huart2, (uint8_t*)&character, 1, 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t*)&character, 1, 10);
 	osMutexRelease(MutexUARTputcharHandle);
 }
 
