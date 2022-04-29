@@ -1,0 +1,12 @@
+../Core/Src/parser.c:23:6:Parser_Register_PIDPrintCallback	16	static
+../Core/Src/parser.c:28:6:Parser_Register_IMUPrintCallback	16	static
+../Core/Src/parser.c:33:6:Parser_Register_MotorsPrintCallback	16	static
+../Core/Src/parser.c:38:6:Parser_Register_OtherPrintCallback	16	static
+../Core/Src/parser.c:43:6:Parser_Register_ReceiveLineCallback	16	static
+../Core/Src/parser.c:48:29:Parser_GetFloatValue	24	static
+../Core/Src/parser.c:69:29:Parser_GetIntValue	24	static
+../Core/Src/parser.c:89:29:Parser_ParseOther	24	static
+../Core/Src/parser.c:122:29:Parser_ParseMotors	24	static
+../Core/Src/parser.c:182:29:Parser_ParseIMU	24	static
+../Core/Src/parser.c:222:29:Parser_ParsePID	24	static
+../Core/Src/parser.c:255:22:Parser_ParseLine	16	static

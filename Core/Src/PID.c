@@ -6,7 +6,7 @@
  */
 #include "PID.h"
 
-void PID_Init(PID_t *pid, double* Input, double* Output, double* Setpoint, double Kp, double Ki, double Kd, int POn, int ControllerDirection)
+void PID_Init(PID_t *pid, float* Input, float* Output, float* Setpoint, float Kp, float Ki, float Kd, int POn, int ControllerDirection)
 {
     pid->myOutput = Output;
     pid->myInput = Input;
@@ -19,7 +19,7 @@ void PID_Init(PID_t *pid, double* Input, double* Output, double* Setpoint, doubl
     PID_SetTunings(pid, Kp, Ki, Kd, POn);
 }
 
-void PID_SetTunings(PID_t *pid, double Kp, double Ki, double Kd, int POn)
+void PID_SetTunings(PID_t *pid, float Kp, float Ki, float Kd, int POn)
 {
    if (Kp<0 || Ki<0 || Kd<0) return;
 
@@ -30,7 +30,7 @@ void PID_SetTunings(PID_t *pid, double Kp, double Ki, double Kd, int POn)
    pid->dispKi = Ki;
    pid->dispKd = Kd;
 
-   double SampleTimeInSec = ((double)pid->SampleTime)/1000;
+   float SampleTimeInSec = ((float)pid->SampleTime)/1000;
    pid->kp = Kp;
    pid->ki = Ki * SampleTimeInSec;
    pid->kd = Kd / SampleTimeInSec;
@@ -47,15 +47,15 @@ void PID_SetSampleTime(PID_t *pid, int NewSampleTime)
 {
    if (NewSampleTime > 0)
    {
-      double ratio  = (double)NewSampleTime
-                      / (double)pid->SampleTime;
+      float ratio  = (float)NewSampleTime
+                      / (float)pid->SampleTime;
       pid->ki *= ratio;
       pid->kd /= ratio;
       pid->SampleTime = (unsigned long)NewSampleTime;
    }
 }
 
-void PID_SetOutputLimits(PID_t *pid, double Min, double Max)
+void PID_SetOutputLimits(PID_t *pid, float Min, float Max)
 {
    if(Min >= Max) return;
    pid->outMin = Min;
@@ -103,9 +103,9 @@ bool PID_Compute(PID_t *pid)
    }
 
       /*Compute all the working error variables*/
-      double input = *pid->myInput;
-      double error = *pid->mySetpoint - input;
-      double dInput = (input - pid->lastInput);
+      float input = *pid->myInput;
+      float error = *pid->mySetpoint - input;
+      float dInput = (input - pid->lastInput);
       pid->outputSum+= (pid->ki * error);
 
       /*Add Proportional on Measurement, if P_ON_M is specified*/
@@ -118,7 +118,7 @@ bool PID_Compute(PID_t *pid)
       else if(pid->outputSum < pid->outMin) pid->outputSum= pid->outMin;
 
       /*Add Proportional on Error, if P_ON_E is specified*/
-	  double output;
+	  float output;
       if(pid->pOnE) output = pid->kp * error;
       else output = 0;
 

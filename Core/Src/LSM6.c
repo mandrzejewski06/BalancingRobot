@@ -238,7 +238,7 @@ uint8_t LSM6_Read(LSM6_t *LSM6)
 
 	return HAL_OK;
 }
-
+/*
 // Vector's basic functions
 int16_t vector_dot(Vector_t *vector_a, Vector_t *vector_b)
 {
@@ -260,3 +260,4 @@ void vector_normalize(Vector_t *vector)
 	vector->y = (vector->y / mag);
 	vector->z = (vector->z / mag);
 }
+*/

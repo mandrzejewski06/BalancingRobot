@@ -10,12 +10,24 @@
 
 #define ABS(value) (value < 0 ? -value : value)
 
+static uint16_t maxSpeed = DRV8834_MOT_DEFAULT_MAX_SPEED;
+static uint16_t maxFrequency = DRV8834_MOT_DEFAULT_MAX_FREQ;
+static RoborState_t state;
+
+
+
+void DRV8834_setRobotState(uint16_t st) { state = st;}
+void DRV8834_setMaxSpeed(uint16_t spd) { maxSpeed = spd;}
+void DRV8834_setMaxFreq(uint16_t freq) { maxFrequency = freq; }
+uint16_t DRV8834_getRobotState(void) { return state; }
+uint16_t DRV8834_getMaxSpeed(void) { return maxSpeed; }
+uint16_t DRV8834_getMaxFreq(void) { return maxFrequency; }
+
 void DRV8834_Init(StepMotor_t *stepMotor, TIM_HandleTypeDef *htim, uint32_t channel)
 {
 	stepMotor->PWM_timer = htim;
 	stepMotor->PWM_timerChannel = channel;
-	stepMotor->state = STOPPED;
-	stepMotor->direction = FORWARD;
+	stepMotor->direction = __MOTOR_FWD;
 	stepMotor->last_counter = 0;
 }
 
@@ -37,7 +49,7 @@ void DeinitializePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint16_t Mode)
 
 	if(Mode == GPIO_MODE_OUTPUT_PP)
 	{
-		HAL_GPIO_DeInit(GPIOx, GPIO_Pin);
+		//HAL_GPIO_DeInit(GPIOx, GPIO_Pin); // CZY POTRZEBNE?
 		GPIO_InitStruct.Pin = GPIO_Pin;
 		GPIO_InitStruct.Mode = Mode;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -68,7 +80,7 @@ uint8_t DRV8834_SetMicrostep(StepMotor_t *stepMotor, uint8_t microstep)
      *  Z = high impedance mode (M0 is three-state)
      */
 
-	if(stepMotor->state == CONTINOUS_RUN)
+	if(state != STOPPED)
 	{
 		return HAL_ERROR;
 	}
@@ -109,15 +121,14 @@ uint8_t DRV8834_SetMicrostep(StepMotor_t *stepMotor, uint8_t microstep)
 
 void DRV8834_StopMotor(StepMotor_t *stepMotor)
 {
-	stepMotor->state = STOPPED;
-
-	__HAL_TIM_SET_COMPARE(stepMotor->PWM_timer, stepMotor->PWM_timerChannel, 0);
+	//__HAL_TIM_SET_COMPARE(stepMotor->PWM_timer, stepMotor->PWM_timerChannel, 0); // CZY POTRZEBNE?
 	HAL_TIM_PWM_Stop(stepMotor->PWM_timer, stepMotor->PWM_timerChannel);
+	state = STOPPED;
 }
 
-void DRV8834_SetDirection(StepMotor_t *stepMotor, StepMotorDirection_t dir)
+static void DRV8834_SetDirection(StepMotor_t *stepMotor, StepMotorDirection_t dir)
 {
-	if((dir == FORWARD) || (dir == BACKWARD))
+	if((dir == __MOTOR_FWD) || (dir == __MOTOR_BACK))
 	{
 		HAL_GPIO_WritePin(stepMotor->step_motor_pins.DIR_PORT, stepMotor->step_motor_pins.DIR_PIN, dir);
 		stepMotor->direction = dir;
@@ -128,36 +139,31 @@ void DRV8834_SetSpeed(StepMotor_t *stepMotor, int32_t speed)
 {
 	uint32_t counter, freq;
 
-	if(speed == 0)
+	if((speed < 0) && (stepMotor->direction == __MOTOR_FWD))
 	{
-		if(stepMotor->state == STOPPED) return;
-
-		DRV8834_StopMotor(stepMotor);
-		return;
+		DRV8834_SetDirection(stepMotor, __MOTOR_BACK);
 	}
-	else if((speed < 0) && (stepMotor->direction == FORWARD))
+	else if((speed > 0) && (stepMotor->direction == __MOTOR_BACK))
 	{
-		DRV8834_SetDirection(stepMotor, BACKWARD);
-	}
-	else if((speed > 0) && (stepMotor->direction == BACKWARD))
-	{
-		DRV8834_SetDirection(stepMotor, FORWARD);
+		DRV8834_SetDirection(stepMotor, __MOTOR_FWD);
 	}
 
 	if(speed < 0)
 	{
 		speed = ABS(speed);
 	}
-	if(speed > DRV8834_MAX_SPEED)
+	if(speed > maxSpeed)
 	{
-		speed = DRV8834_MAX_SPEED;
+		speed = maxSpeed;
 	}
 
-
-	freq = (speed * (stepMotor->microstep*(DRV8834_MOTOR_MAX_FREQ_HZ - DRV8834_MOTOR_MIN_FREQ_HZ))) / DRV8834_MAX_SPEED;
+	freq = (speed * (stepMotor->microstep*(maxFrequency - DRV8834_MOT_MIN_FREQ))) / maxSpeed;
 
 #if USING_WHICH_TIMERS == APB1
-	counter = PCLK_PRESCALER*HAL_RCC_GetPCLK1Freq() / (stepMotor->PWM_timer->Init.Prescaler * freq);
+	if(freq != 0)
+		counter = PCLK_PRESCALER*HAL_RCC_GetPCLK1Freq() / (stepMotor->PWM_timer->Init.Prescaler * freq);
+	else
+		counter = 0;
 #elif USING_WHICH_TIMERS == APB2
 		counter = PCLK_PRESCALER*HAL_RCC_GetPCLK2Freq() / (stepMotor->PWM_timer->Init.Prescaler * freq);
 #else
@@ -165,16 +171,25 @@ void DRV8834_SetSpeed(StepMotor_t *stepMotor, int32_t speed)
 #endif
 	if(stepMotor->last_counter != counter)
 	{
-		__HAL_TIM_SET_COUNTER(stepMotor->PWM_timer, 0);
-		__HAL_TIM_SET_AUTORELOAD(stepMotor->PWM_timer, counter - 1);
-		__HAL_TIM_SET_COMPARE(stepMotor->PWM_timer, stepMotor->PWM_timerChannel, (counter/2) - 1);
+		if(counter == 0)
+		{
+			__HAL_TIM_SET_COUNTER(stepMotor->PWM_timer, 0);
+			__HAL_TIM_SET_AUTORELOAD(stepMotor->PWM_timer, 0);
+			__HAL_TIM_SET_COMPARE(stepMotor->PWM_timer, stepMotor->PWM_timerChannel, 0);
+		}
+		else
+		{
+			__HAL_TIM_SET_COUNTER(stepMotor->PWM_timer, 0);
+			__HAL_TIM_SET_AUTORELOAD(stepMotor->PWM_timer, counter - 1);
+			__HAL_TIM_SET_COMPARE(stepMotor->PWM_timer, stepMotor->PWM_timerChannel, (counter/2) - 1);
+		}
 		stepMotor->last_counter = counter;
 	}
 }
 
 void DRV8834_StartMotor(StepMotor_t *stepMotor, int32_t speed)
 {
-	stepMotor->state = CONTINOUS_RUN;
+	state = BALANCING;
 
 	DRV8834_SetSpeed(stepMotor, speed);
 

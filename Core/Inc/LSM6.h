@@ -141,8 +141,9 @@ uint16_t getTimeout(LSM6_t *LSM6);
 // Did an error occur in readAcc(), readGyro(), or read() since the last call to errorOccurred()?
 bool errorOccured(LSM6_t *LSM6);
 // Vector's basic functions
+/*
 int16_t vector_dot(Vector_t *vector_a, Vector_t *vector_b);
 void vector_cross(Vector_t *vector_a, Vector_t *vector_b, Vector_t *vector_out);
 void vector_normalize(Vector_t *vector);
-
+*/
 #endif /* INC_LSM6_H_ */

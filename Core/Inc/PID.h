@@ -20,33 +20,33 @@
 #define SAMPLE_TIME_DEFAULT 100	// in miliseconds
 
 typedef struct PID {
-	double dispKp;				// * we'll hold on to the tuning parameters in user-entered
-	double dispKi;				//   format for display purposes
-	double dispKd;				//
+	float dispKp;				// * we'll hold on to the tuning parameters in user-entered
+	float dispKi;				//   format for display purposes
+	float dispKd;				//
 
-	double kp;                  // * (P)roportional Tuning Parameter
-    double ki;                  // * (I)ntegral Tuning Parameter
-    double kd;                  // * (D)erivative Tuning Parameter
+	float kp;                  // * (P)roportional Tuning Parameter
+    float ki;                  // * (I)ntegral Tuning Parameter
+    float kd;                  // * (D)erivative Tuning Parameter
 
 	uint8_t controllerDirection;
 	uint8_t pOn;
 
-    double *myInput;              // * Pointers to the Input, Output, and Setpoint variables
-    double *myOutput;             //   This creates a hard link between the variables and the
-    double *mySetpoint;           //   PID, freeing the user from having to constantly tell us
+    float *myInput;              // * Pointers to the Input, Output, and Setpoint variables
+    float *myOutput;             //   This creates a hard link between the variables and the
+    float *mySetpoint;           //   PID, freeing the user from having to constantly tell us
                                   //   what these values are.  with pointers we'll just know.
 
-	double outputSum, lastInput;
+	float outputSum, lastInput;
 
 	uint32_t SampleTime;
-	double outMin, outMax;
+	float outMin, outMax;
 	bool inAuto, pOnE;
 } PID_t;
 
-void PID_Init(PID_t *pid, double* Input, double* Output, double* Setpoint, double Kp, double Ki, double Kd, int POn, int ControllerDirection);
-void PID_SetTunings(PID_t *pid, double Kp, double Ki, double Kd, int POn);
+void PID_Init(PID_t *pid, float* Input, float* Output, float* Setpoint, float Kp, float Ki, float Kd, int POn, int ControllerDirection);
+void PID_SetTunings(PID_t *pid, float Kp, float Ki, float Kd, int POn);
 void PID_SetSampleTime(PID_t *pid, int NewSampleTime);
-void PID_SetOutputLimits(PID_t *pid, double Min, double Max);
+void PID_SetOutputLimits(PID_t *pid, float Min, float Max);
 void PID_SetMode(PID_t *pid, int Mode);
 void PID_SetControllerDirection(PID_t *pid, int Direction);
 bool PID_Compute(PID_t *pid);

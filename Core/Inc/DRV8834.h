@@ -12,12 +12,16 @@
 #define PCLK_PRESCALER 2
 // STEPPER MOTOR CONFIGURATION CONSTANTS
 #define DRV8834_MOTOR_STEP_PER_REVOLUTION	200
-#define DRV8834_MOTOR_MAX_FREQ_HZ			350
-#define DRV8834_MOTOR_MIN_FREQ_HZ			1
-#define DRV8834_MAX_SPEED					50
+#define DRV8834_MOT_DEFAULT_MAX_FREQ		350
+#define DRV8834_MOT_MIN_FREQ				1
+#define DRV8834_MOT_DEFAULT_MAX_SPEED		50
 
-typedef enum {STOPPED = 0, CONTINOUS_RUN = 1} StepMotorState_t;
-typedef enum {FORWARD = 0, BACKWARD = 1} StepMotorDirection_t;
+typedef enum {
+	STOPPED = 0, FORWARD, BACKWARD, LEFT, RIGHT, BALANCING
+} RoborState_t;
+
+typedef enum {__MOTOR_FWD = 0, __MOTOR_BACK = 1} StepMotorDirection_t;
+
 typedef struct
 {
 	uint16_t DIR_PIN;
@@ -30,7 +34,6 @@ typedef struct
 
 typedef struct
 {
-	StepMotorState_t state;
 	StepMotorDirection_t direction;
 	StepMotorPins_t step_motor_pins;
 
@@ -41,12 +44,18 @@ typedef struct
 	uint32_t last_counter;
 } StepMotor_t;
 
+void DRV8834_setRobotState(uint16_t st);
+void DRV8834_setMaxSpeed(uint16_t spd);
+void DRV8834_setMaxFreq(uint16_t freq);
+uint16_t DRV8834_getRobotState(void);
+uint16_t DRV8834_getMaxSpeed(void);
+uint16_t DRV8834_getMaxFreq(void);
+
 void DRV8834_Init(StepMotor_t *stepMotor, TIM_HandleTypeDef *htim, uint32_t channel);
 void DRV8834_InitPins(StepMotor_t *stepMotor, uint16_t dirPin, GPIO_TypeDef* dirPort, uint16_t m0Pin, GPIO_TypeDef* m0Port, uint16_t m1Pin, GPIO_TypeDef* m1Port);
 void DeinitializePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint16_t Mode);
 uint8_t DRV8834_SetMicrostep(StepMotor_t *stepMotor, uint8_t microstep);
 void DRV8834_StopMotor(StepMotor_t *stepMotor);
-void DRV8834_SetDirection(StepMotor_t *stepMotor, StepMotorDirection_t dir);
 void DRV8834_SetSpeed(StepMotor_t *stepMotor, int32_t speed);
 void DRV8834_StartMotor(StepMotor_t *stepMotor, int32_t speed);
 
