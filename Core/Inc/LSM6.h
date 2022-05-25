@@ -10,16 +10,18 @@
 
 #include "main.h"
 
-// LSM6DS33 addresses //
-#define DS33_SA0_HIGH_ADDRESS 0b1101011
-#define DS33_SA0_LOW_ADDRESS  0b1101010
-#define DS33_WHO_ID    0x69		//0b1101001 - register WHO_AM_I value for DS33
+// Adresy LSM6DS33 w zależności od stanu pinu SA0
+#define DS33_SA0_HIGH_ADDRESS 0b1101011		// SA0 - stan wysoki
+#define DS33_SA0_LOW_ADDRESS  0b1101010		// SA0 - stan niski
+// Wartość rejestru WHO_AM_I (0x0F) dla układu DS33
+#define DS33_WHO_ID    0x69
 
-// Default timeout and error defines
+// Domyślna wartość dla błędu i timeout'u
+// TODO: usunąć error, implementacje błędu zrobić w enumie
 #define ERROR 0
 #define DEFAULT_TIMEOUT 1000
 
-// Register addresses //
+// Adresy rejestrów układu LSM6DS33 - opisy w dokumentacji układu
 #define      FUNC_CFG_ACCESS    0x01
 #define      FIFO_CTRL1         0x06
 #define   	 FIFO_CTRL2         0x07
@@ -88,7 +90,7 @@
 #define      MD1_CFG            0x5E
 #define      MD2_CFG            0x5F
 
-// Structure to memorize coordinates of a vector
+// Struktura wektora 3D
 typedef struct vector
 {
 	double x;
@@ -96,54 +98,58 @@ typedef struct vector
 	double z;
 } Vector_t;
 
-// Used to manually choose device type or detect device automatically
+// Wybór ręczny układu scalonego znajdującego się w module LSM6 lub wykorzystanie autodetekcji*.
+// Na dzień 02.05.22r. istnieje tylko wersja z układem DS33, jednak jest to szablon przygotowany
+// na przyszłe możliwe inne wersje układu.
 typedef enum deviceType {device_DS33, device_autoDetect} deviceType;
 
-// State of the SA0 pin.
+// Wybór ręczny stanu pinu SA0 lub wykorzystanie autodetekcji*.
 typedef enum sa0State {sa0_low, sa0_high, sa0_autoDetect} sa0State;
+// *Dokładny opis o co chodzi w autodektekcji znajduje się w pliku LSM6.c
 
-// Structure of basic LSM6
+// Struktura obiektu LSM6
 typedef struct lsm6
 {
-	I2C_HandleTypeDef *i2c;	// i2c handler
-	deviceType _device; 	// chip type
-	uint8_t address;		// address of the device
-	uint16_t io_timeout;	// i2c timeout
-	bool did_timeout;		// did timeout occur on i2c?
-	bool did_error;			// did error occur on i2c?
-
-	Vector_t accelerometer; // accelerometer vector
-	Vector_t gyroscope;		// gyroscope vector
+	I2C_HandleTypeDef *i2c;	// Wskaźnik do używanego I2C w STM32
+	deviceType _device; 	// Rodzaj układu scalonego w module LSM6
+	uint8_t address;		// Adres I2C modułu
+	// TODO: timeout przenieść jako zmienną statyczną do pliku LSM6.c
+	uint16_t io_timeout;	// Timeout dla transmisji na I2C
+	// TODO: usunąć did_timeout i did_error i zaimplementować enum, który funkcje będą zwracały
+	bool did_timeout;		// Czy od ostatniego sprawdzenia wystąpił timeout?
+	bool did_error;			// Czy od ostatniego sprawdzenia wystąpił error?
+	// Wektory przechowujące najnowszee dane z modułu
+	Vector_t accelerometer; // Wektor dla akcelerometru
+	Vector_t gyroscope;		// Wektor dla żyroskopu
 } LSM6_t;
 
-// Initialize extended function - detecting device using deviceType and sa0State (definition above)
+// Funkcja inicjalizująca moduł LSM6
+// TODO: zmienić funkcje InitEx na Init
 bool LSM6_InitEx(I2C_HandleTypeDef *i2c, LSM6_t *LSM6, deviceType device, sa0State sa0);
-// Initialize function - default DS33 device and SA0 pin connected to GND
-//bool LSM6_Init(I2C_HandleTypeDef *i2c, LSM6_t *LSM6) { return LSM6_InitEx(i2c, LSM6, device_DS33, sa0_low);}
-// Returns chip id if communication is established, return 0 if not
+// Funkcja zwracająca wartość rejesru WHO_AM_I, zwraca 0 jeśli nie udało się odczytać
 uint8_t testReg(LSM6_t *LSM6, uint8_t address, uint8_t reg);
-// Writes 8-bits
+// Funkcja wpisująca 8-bitów do danego rejestru (po I2C)
 void writeReg(LSM6_t *LSM6, uint8_t reg, uint8_t value);
-// Reads 8-bits
+// Funkcja czytająca 8-bitów z danego rejestru (po I2C)
 uint8_t readReg(LSM6_t *LSM6, uint8_t reg);
-// Starts gyroscope and accelerometer
+// Funkcja ustawiająca domyślny tryb modułu (ustawia przerwania, częstotliwość itp.)
+// TODO: zaimplementować możliwość zmiany parametrów w trakcie działania programu
 void enableDefault(LSM6_t *LSM6);
-// Reads accelerometer data
+// Funkcja czytająca dane z akcelerometru
 uint8_t readAcc(LSM6_t *LSM6);
-// Reads gyroscope data
+// Funkcja czytająca dane z żyroskopu
 uint8_t readGyro(LSM6_t *LSM6);
-// Main function to read LSM6 data - using both functions above
+//TODO: Rozważyć przeniesienie funkcji readAcc i readGyro jako funkcji statycznych
+
+// Główna funkcja slużąca do odczytu danych z LSM6
 uint8_t LSM6_Read(LSM6_t *LSM6);
-// Did a timeout occur in readAcc(), readGyro(), or read() since the last call to timeoutOccurred()?
+// Funkcje służące do obsługi timeout'u
+// TODO: Usunąć funkcję timeoutOccured
 bool timeoutOccurred(LSM6_t *LSM6);
 void setTimeout(LSM6_t *LSM6, uint16_t timeout);
 uint16_t getTimeout(LSM6_t *LSM6);
-// Did an error occur in readAcc(), readGyro(), or read() since the last call to errorOccurred()?
+// Funkcja informująca czy od ostatniego sprawdzenia wystąpił error
+// TODO: Usunąć tę funkcję
 bool errorOccured(LSM6_t *LSM6);
-// Vector's basic functions
-/*
-int16_t vector_dot(Vector_t *vector_a, Vector_t *vector_b);
-void vector_cross(Vector_t *vector_a, Vector_t *vector_b, Vector_t *vector_out);
-void vector_normalize(Vector_t *vector);
-*/
+
 #endif /* INC_LSM6_H_ */

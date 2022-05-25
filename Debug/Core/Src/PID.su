@@ -1,7 +1,10 @@
-../Core/Src/PID.c:9:6:PID_Init	40	static
-../Core/Src/PID.c:22:6:PID_SetTunings	40	static
-../Core/Src/PID.c:46:6:PID_SetSampleTime	24	static
-../Core/Src/PID.c:58:6:PID_SetOutputLimits	24	static
-../Core/Src/PID.c:74:6:PID_SetMode	24	static
-../Core/Src/PID.c:87:6:PID_SetControllerDirection	16	static
-../Core/Src/PID.c:98:6:PID_Compute	32	static
+../Core/Src/PID.c:10:6:PID_Init	40	static
+../Core/Src/PID.c:25:6:PID_SetTunings	40	static
+../Core/Src/PID.c:53:6:setKp	16	static
+../Core/Src/PID.c:65:6:setKi	24	static
+../Core/Src/PID.c:77:6:setKd	24	static
+../Core/Src/PID.c:90:6:PID_SetSampleTime	24	static
+../Core/Src/PID.c:106:6:PID_SetOutputLimits	24	static
+../Core/Src/PID.c:128:6:PID_SetMode	24	static
+../Core/Src/PID.c:150:6:PID_SetControllerDirection	16	static
+../Core/Src/PID.c:165:6:PID_Compute	32	static
